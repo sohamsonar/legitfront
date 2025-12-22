@@ -297,7 +297,7 @@ import { UploadArea } from "./UploadArea";
 import { ProcessSteps } from "./ProcessSteps";
 
 import { uploadTemplate } from "../../api/uploadTemplate";
-import { createTemplate } from "../../api/createTemplate";
+// import { createTemplate } from "../../api/createTemplate";
 import { highlightText } from "../../utils/highlightText";
 
 /* =======================
@@ -341,9 +341,9 @@ export default function UploadPage() {
     location.state?.parsedText || []
   );
 
-  const [uploadId, setUploadId] = useState<string | null>(
-    location.state?.uploadId || null
-  );
+  // const [uploadId, setUploadId] = useState<string | null>(
+  //   location.state?.uploadId || null
+  // );
 
   const [detectedFields, setDetectedFields] = useState<DetectedField[]>([
     {
@@ -382,7 +382,7 @@ export default function UploadPage() {
 
       // Store in local state
       setParsedText(paragraphs);
-      setUploadId(result.upload_id);
+      //setUploadId(result.upload_id);
       setCurrentStep(3);
 
       // 👉 Navigate to preview page with same UI
@@ -403,7 +403,7 @@ export default function UploadPage() {
   const handleReset = () => {
     setSelectedFile(null);
     setParsedText([]);
-    setUploadId(null);
+    //setUploadId(null);
     setCurrentStep(1);
     navigate("/upload");
   };
@@ -412,50 +412,50 @@ export default function UploadPage() {
      Template helpers
   ======================= */
 
-  const buildBackendFields = () => {
-    return detectedFields.map((field) => ({
-      field_key: field.field_key,
-      label: field.label,
-      field_type: field.field_type,
-      is_required: field.is_required,
-      source_temp_id: field.id,
-      location_json: {
-        version: 1,
-        kind: "range_in_text",
-        pattern: "detected",
-        scope: "body",
-        paragraph_index: field.paragraph_index ?? 0,
-        start: field.start ?? 0,
-        end: field.end ?? 10,
-      },
-    }));
-  };
+  // const buildBackendFields = () => {
+  //   return detectedFields.map((field) => ({
+  //     field_key: field.field_key,
+  //     label: field.label,
+  //     field_type: field.field_type,
+  //     is_required: field.is_required,
+  //     source_temp_id: field.id,
+  //     location_json: {
+  //       version: 1,
+  //       kind: "range_in_text",
+  //       pattern: "detected",
+  //       scope: "body",
+  //       paragraph_index: field.paragraph_index ?? 0,
+  //       start: field.start ?? 0,
+  //       end: field.end ?? 10,
+  //     },
+  //   }));
+  // };
 
-  const handleCreateTemplate = async () => {
-    if (!uploadId) {
-      alert("Upload ID missing.");
-      return;
-    }
+  // const handleCreateTemplate = async () => {
+  //   if (!uploadId) {
+  //     alert("Upload ID missing.");
+  //     return;
+  //   }
 
-    try {
-      const payload = {
-        upload_id: uploadId,
-        name: "Director Resignation Letter",
-        description: "Resignation letter for Director/MD/WTD",
-        fields: buildBackendFields(),
-      };
+  //   try {
+  //     const payload = {
+  //       upload_id: uploadId,
+  //       name: "Director Resignation Letter",
+  //       description: "Resignation letter for Director/MD/WTD",
+  //       fields: buildBackendFields(),
+  //     };
 
-      console.log("[Template] Payload:", payload);
+  //     console.log("[Template] Payload:", payload);
 
-      const result = await createTemplate(payload);
-      console.log("[Template] Created:", result);
+  //     const result = await createTemplate(payload);
+  //     console.log("[Template] Created:", result);
 
-      alert(`Template created successfully (ID: ${result.template_id})`);
-    } catch (err) {
-      console.error("[Template] Creation failed:", err);
-      alert("Template creation failed");
-    }
-  };
+  //     alert(`Template created successfully (ID: ${result.template_id})`);
+  //   } catch (err) {
+  //     console.error("[Template] Creation failed:", err);
+  //     alert("Template creation failed");
+  //   }
+  // };
 
   /* =======================
      UI (UNCHANGED)
