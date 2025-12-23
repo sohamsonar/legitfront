@@ -483,7 +483,571 @@
 
 
 // Soham New Update 23/12/2025
-import { useEffect, useState } from "react";
+// import { useState } from "react";
+// import { useLocation, useNavigate } from "react-router-dom";
+// import { createTemplate } from "../../api/createTemplate";
+
+// /* =======================
+//    Types
+// ======================= */
+
+// type DetectedField = {
+//   id: string;
+//   rawText?: string;
+//   field_key: string;
+//   label: string;
+//   field_type: "text" | "date" | "number";
+//   is_required: boolean;
+//   paragraph_index: number;
+//   start: number;
+//   end: number;
+//   value: string;
+// };
+
+// /* =======================
+//    Component
+// ======================= */
+
+// export default function DocumentPreview() {
+//   const location = useLocation();
+//   const navigate = useNavigate();
+
+//   /* =======================
+//      Read navigation state
+//   ======================= */
+
+//   const parsedText: string[] = location.state?.parsedText || [];
+//   const uploadId: string | null = location.state?.uploadId || null;
+//   const incomingFields: DetectedField[] =
+//     location.state?.detectedFields || [];
+
+//   /* =======================
+//      Guard
+//   ======================= */
+
+//   if (!parsedText.length || !uploadId) {
+//     return <div className="p-8">No data found.</div>;
+//   }
+
+//   /* =======================
+//      Local editable state
+//   ======================= */
+
+//   const [fields, setFields] = useState<DetectedField[]>(
+//     incomingFields.map((f) => ({
+//       ...f,
+//       label: f.label || "Text",
+//       value: f.value ?? "",
+//     }))
+//   );
+
+//   /* =======================
+//      Preview Renderer
+//   ======================= */
+
+//   const renderParagraphWithFields = (
+//     text: string,
+//     paragraphIndex: number
+//   ) => {
+//     const paragraphFields = fields
+//       .filter((f) => f.paragraph_index === paragraphIndex)
+//       .sort((a, b) => a.start - b.start);
+
+//     if (paragraphFields.length === 0) return text;
+
+//     let cursor = 0;
+//     const parts: React.ReactNode[] = [];
+
+//     paragraphFields.forEach((field) => {
+//       // text before field
+//       parts.push(
+//         <span key={`${field.id}-before`}>
+//           {text.slice(cursor, field.start)}
+//         </span>
+//       );
+
+//       // field input
+//       parts.push(
+//         <input
+//           key={field.id}
+//           value={field.value}
+//           placeholder={field.label}
+//           onChange={(e) =>
+//             setFields((prev) =>
+//               prev.map((f) =>
+//                 f.id === field.id
+//                   ? { ...f, value: e.target.value }
+//                   : f
+//               )
+//             )
+//           }
+//           className="inline-block min-w-[160px] px-2 py-0.5 mx-1
+//                      border border-blue-500 rounded bg-blue-50
+//                      focus:outline-none focus:ring-2 focus:ring-blue-300"
+//         />
+//       );
+
+//       cursor = field.end;
+//     });
+
+//     // remaining text
+//     parts.push(
+//       <span key="after">{text.slice(cursor)}</span>
+//     );
+
+//     return parts;
+//   };
+
+//   /* =======================
+//      Actions
+//   ======================= */
+
+//  const handleNext = async () => {
+//   try {
+//     const result = await createTemplate({
+//       upload_id: uploadId,
+//       name: "Generated Template",
+//       description: "Auto-generated from document",
+//       fields: fields.map((f) => ({
+//         field_key: f.field_key,
+//         label: f.label,
+//         field_type: f.field_type,
+//         is_required: f.is_required,
+//         source_temp_id: f.id,
+//         location_json: {
+//           version: 1,
+//           kind: "range_in_text",
+//           paragraph_index: f.paragraph_index,
+//           start: f.start,
+//           end: f.end,
+//         },
+//       })),
+//     });
+
+//     // 👉 OPTION A: Go to templates list
+//     navigate("/templates");
+
+//     // 👉 OPTION B (recommended UX): go directly to generate
+//     // navigate(`/generate/${result.template_id}`);
+
+//   } catch (err) {
+//     console.error("Template creation failed", err);
+//     alert("Failed to create template");
+//   }
+// };
+
+
+//   /* =======================
+//      UI
+//   ======================= */
+
+//   return (
+//     <div className="space-y-10">
+//       {/* Header */}
+//       <div>
+//         <h2 className="text-xl font-bold mb-1">
+//           Document Preview
+//         </h2>
+//         <p className="text-sm text-muted-foreground">
+//           Review detected fields and edit values
+//         </p>
+//       </div>
+
+//       {/* Document Preview */}
+//       <div className="rounded-lg border bg-white p-6 shadow-sm">
+//         <div className="space-y-3 max-h-[60vh] overflow-y-auto">
+//           {parsedText.map((text, index) => (
+//             <p
+//               key={index}
+//               className="text-sm text-gray-800 leading-relaxed"
+//             >
+//               {renderParagraphWithFields(text, index)}
+//             </p>
+//           ))}
+//         </div>
+//       </div>
+
+//       {/* Field Configuration */}
+//       {fields.length > 0 && (
+//         <div className="rounded-lg border bg-white p-6 shadow-sm">
+//           <h3 className="text-lg font-semibold mb-4">
+//             Template Fields
+//           </h3>
+
+//           <div className="space-y-4">
+//             {fields.map((field) => (
+//               <div
+//                 key={field.id}
+//                 className="grid grid-cols-4 gap-4 items-center border-b pb-3"
+//               >
+//                 {/* Label */}
+//                 <input
+//                   value={field.label}
+//                   onChange={(e) =>
+//                     setFields((prev) =>
+//                       prev.map((f) =>
+//                         f.id === field.id
+//                           ? { ...f, label: e.target.value }
+//                           : f
+//                       )
+//                     )
+//                   }
+//                   className="border px-2 py-1 rounded"
+//                 />
+
+//                 {/* Type */}
+//                 <select
+//                   value={field.field_type}
+//                   onChange={(e) =>
+//                     setFields((prev) =>
+//                       prev.map((f) =>
+//                         f.id === field.id
+//                           ? {
+//                               ...f,
+//                               field_type: e.target.value as any,
+//                             }
+//                           : f
+//                       )
+//                     )
+//                   }
+//                   className="border px-2 py-1 rounded"
+//                 >
+//                   <option value="text">Text</option>
+//                   <option value="date">Date</option>
+//                   <option value="number">Number</option>
+//                 </select>
+
+//                 {/* Required */}
+//                 <label className="flex items-center gap-2">
+//                   <input
+//                     type="checkbox"
+//                     checked={field.is_required}
+//                     onChange={(e) =>
+//                       setFields((prev) =>
+//                         prev.map((f) =>
+//                           f.id === field.id
+//                             ? {
+//                                 ...f,
+//                                 is_required: e.target.checked,
+//                               }
+//                             : f
+//                         )
+//                       )
+//                     }
+//                   />
+//                   Required
+//                 </label>
+
+//                 {/* Key */}
+//                 <input
+//                   value={field.field_key}
+//                   readOnly
+//                   className="border px-2 py-1 rounded bg-gray-100"
+//                 />
+//               </div>
+//             ))}
+//           </div>
+//         </div>
+//       )}
+
+//       {/* Footer */}
+//       <div className="flex justify-end">
+//         <button
+//           onClick={handleNext}
+//           className="px-6 py-2 bg-black text-white rounded"
+//         >
+//           Continue
+//         </button>
+//       </div>
+//     </div>
+//   );
+// }
+
+
+// Soham New Update 24/12/2025 - 0.2
+
+// import { useState } from "react";
+// import { useLocation, useNavigate } from "react-router-dom";
+// import { createTemplate } from "../../api/createTemplate";
+
+// /* =======================
+//    Types
+// ======================= */
+
+// type DetectedField = {
+//   id: string;
+//   rawText?: string;
+//   field_key: string;
+//   label: string;
+//   field_type: "text" | "date" | "number";
+//   is_required: boolean;
+//   paragraph_index: number;
+//   start: number;
+//   end: number;
+//   value: string;
+// };
+
+// /* =======================
+//    Component
+// ======================= */
+
+// export default function DocumentPreview() {
+//   const location = useLocation();
+//   const navigate = useNavigate();
+
+//   /* =======================
+//      Read navigation state
+//   ======================= */
+
+//   const parsedText: string[] = location.state?.parsedText || [];
+//   const uploadId: string | null = location.state?.uploadId || null;
+//   const incomingFields: DetectedField[] =
+//     location.state?.detectedFields || [];
+
+//   /* =======================
+//      Guard
+//   ======================= */
+
+//   if (!parsedText.length || !uploadId) {
+//     return <div className="p-8">No data found.</div>;
+//   }
+
+//   /* =======================
+//      Local editable state
+//   ======================= */
+
+//   const [fields, setFields] = useState<DetectedField[]>(
+//     incomingFields.map((f) => ({
+//       ...f,
+//       label: f.label || "Text",
+//       value: f.value ?? "",
+//     }))
+//   );
+
+//   /* =======================
+//      Preview Renderer (FIXED)
+//   ======================= */
+
+// const renderParagraphWithFields = (
+//   text: string,
+//   paragraphIndex: number
+// ) => {
+//   const paragraphFields = fields
+//     .filter((f) => f.paragraph_index === paragraphIndex)
+//     .sort((a, b) => a.start - b.start);
+
+//   if (paragraphFields.length === 0) return text;
+
+//   const nodes: React.ReactNode[] = [];
+//   let cursor = 0;
+
+//   paragraphFields.forEach((field, i) => {
+//     // text before field
+//     if (cursor < field.start) {
+//       nodes.push(
+//         <span key={`text-${i}`}>
+//           {text.slice(cursor, field.start)}
+//         </span>
+//       );
+//     }
+
+//     // input field
+//     nodes.push(
+//       <input
+//         key={`field-${field.id}`}
+//         value={field.value}
+//         placeholder={field.label}
+//         onChange={(e) =>
+//           setFields((prev) =>
+//             prev.map((f) =>
+//               f.id === field.id
+//                 ? { ...f, value: e.target.value }
+//                 : f
+//             )
+//           )
+//         }
+//         className="inline-block min-w-[160px] px-2 py-0.5 mx-1
+//                    border border-blue-500 rounded bg-blue-50
+//                    focus:outline-none focus:ring-2 focus:ring-blue-300"
+//       />
+//     );
+
+//     cursor = field.end;
+//   });
+
+//   // remaining text after last field
+//   if (cursor < text.length) {
+//     nodes.push(
+//       <span key="text-end">
+//         {text.slice(cursor)}
+//       </span>
+//     );
+//   }
+
+//   return nodes;
+// };
+
+
+//   /* =======================
+//      Actions
+//   ======================= */
+
+//   const handleNext = async () => {
+//     try {
+//       await createTemplate({
+//         upload_id: uploadId,
+//         name: "Generated Template",
+//         description: "Auto-generated from document",
+//         fields: fields.map((f) => ({
+//           field_key: f.field_key,
+//           label: f.label,
+//           field_type: f.field_type,
+//           is_required: f.is_required,
+//           source_temp_id: f.id,
+//           location_json: {
+//             version: 1,
+//             kind: "range_in_text",
+//             paragraph_index: f.paragraph_index,
+//             start: f.start,
+//             end: f.end,
+//           },
+//         })),
+//       });
+
+//       navigate("/templates");
+//     } catch (err) {
+//       console.error("Template creation failed", err);
+//       alert("Failed to create template");
+//     }
+//   };
+
+//   /* =======================
+//      UI
+//   ======================= */
+
+//   return (
+//     <div className="space-y-10">
+//       {/* Header */}
+//       <div>
+//         <h2 className="text-xl font-bold mb-1">
+//           Document Preview
+//         </h2>
+//         <p className="text-sm text-muted-foreground">
+//           Review detected fields and edit values
+//         </p>
+//       </div>
+
+//       {/* Document Preview */}
+//       <div className="rounded-lg border bg-white p-6 shadow-sm">
+//         <div className="space-y-3 max-h-[60vh] overflow-y-auto">
+//           {parsedText.map((text, index) => (
+//             <p
+//               key={index}
+//               className="text-sm text-gray-800 leading-relaxed"
+//             >
+//               {renderParagraphWithFields(text, index)}
+//             </p>
+//           ))}
+//         </div>
+//       </div>
+
+//       {/* Field Configuration */}
+//       {fields.length > 0 && (
+//         <div className="rounded-lg border bg-white p-6 shadow-sm">
+//           <h3 className="text-lg font-semibold mb-4">
+//             Template Fields
+//           </h3>
+
+//           <div className="space-y-4">
+//             {fields.map((field) => (
+//               <div
+//                 key={field.id}
+//                 className="grid grid-cols-4 gap-4 items-center border-b pb-3"
+//               >
+//                 <input
+//                   value={field.label}
+//                   onChange={(e) =>
+//                     setFields((prev) =>
+//                       prev.map((f) =>
+//                         f.id === field.id
+//                           ? { ...f, label: e.target.value }
+//                           : f
+//                       )
+//                     )
+//                   }
+//                   className="border px-2 py-1 rounded"
+//                 />
+
+//                 <select
+//                   value={field.field_type}
+//                   onChange={(e) =>
+//                     setFields((prev) =>
+//                       prev.map((f) =>
+//                         f.id === field.id
+//                           ? {
+//                               ...f,
+//                               field_type: e.target.value as any,
+//                             }
+//                           : f
+//                       )
+//                     )
+//                   }
+//                   className="border px-2 py-1 rounded"
+//                 >
+//                   <option value="text">Text</option>
+//                   <option value="date">Date</option>
+//                   <option value="number">Number</option>
+//                 </select>
+
+//                 <label className="flex items-center gap-2">
+//                   <input
+//                     type="checkbox"
+//                     checked={field.is_required}
+//                     onChange={(e) =>
+//                       setFields((prev) =>
+//                         prev.map((f) =>
+//                           f.id === field.id
+//                             ? {
+//                                 ...f,
+//                                 is_required: e.target.checked,
+//                               }
+//                             : f
+//                         )
+//                       )
+//                     }
+//                   />
+//                   Required
+//                 </label>
+
+//                 <input
+//                   value={field.field_key}
+//                   readOnly
+//                   className="border px-2 py-1 rounded bg-gray-100"
+//                 />
+//               </div>
+//             ))}
+//           </div>
+//         </div>
+//       )}
+
+//       {/* Footer */}
+//       <div className="flex justify-end">
+//         <button
+//         type="button"
+//           onClick={handleNext}
+//           className="px-6 py-2 bg-black text-white rounded"
+//         >
+//           Continue
+//         </button>
+//       </div>
+//     </div>
+//   );
+// }
+
+
+// Test
+
+import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { createTemplate } from "../../api/createTemplate";
 
@@ -491,93 +1055,17 @@ import { createTemplate } from "../../api/createTemplate";
    Types
 ======================= */
 
-type FieldOccurrence = {
-  paragraph_index: number;
-};
-
 type DetectedField = {
+  id: string;
   field_key: string;
   label: string;
-  field_type: "text" | "date";
+  field_type: "text" | "date" | "number";
   is_required: boolean;
-  occurrences: FieldOccurrence[];
+  paragraph_index: number;
+  start: number;
+  end: number;
+  value: string;
 };
-
-type FieldRegistryItem = {
-  field_key: string;
-  label: string;
-  field_type: "text" | "date";
-  is_required: boolean;
-  patterns: RegExp[];
-};
-
-/* =======================
-   FIELD REGISTRY
-   (Logical fields, not blanks)
-======================= */
-
-const FIELD_REGISTRY: FieldRegistryItem[] = [
-  {
-    field_key: "registrar_office_address",
-    label: "Registrar Office Address",
-    field_type: "text",
-    is_required: true,
-    patterns: [/the registrar of llp/i],
-  },
-  {
-    field_key: "llp_name",
-    label: "LLP Name",
-    field_type: "text",
-    is_required: true,
-    patterns: [/llp/i, /private limited/i],
-  },
-  {
-    field_key: "srn_number",
-    label: "SRN Number",
-    field_type: "text",
-    is_required: true,
-    patterns: [/srn filed for incorporation/i],
-  },
-  {
-    field_key: "registered_office_address",
-    label: "Registered Office Address",
-    field_type: "text",
-    is_required: true,
-    patterns: [
-      /registered office/i,
-      /these premises/i,
-      /register this address/i,
-    ],
-  },
-  {
-    field_key: "designated_partner_name",
-    label: "Designated Partner Name",
-    field_type: "text",
-    is_required: true,
-    patterns: [/designated partner/i, /leased to mr/i],
-  },
-  {
-    field_key: "place",
-    label: "Place",
-    field_type: "text",
-    is_required: true,
-    patterns: [/place:/i],
-  },
-  {
-    field_key: "date",
-    label: "Date",
-    field_type: "date",
-    is_required: true,
-    patterns: [/date:/i],
-  },
-];
-
-/* =======================
-   Helper
-======================= */
-
-const getRegistryItem = (key: string) =>
-  FIELD_REGISTRY.find((r) => r.field_key === key);
 
 /* =======================
    Component
@@ -587,123 +1075,145 @@ export default function DocumentPreview() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const parsedText: string[] = location.state?.parsedText || [];
-  const uploadId: string | null = location.state?.uploadId || null;
+  /* =======================
+     Read navigation state
+  ======================= */
 
-  const [detectedFields, setDetectedFields] = useState<DetectedField[]>([]);
-  const [formData, setFormData] = useState<Record<string, string>>({});
+  const parsedText: string[] = location.state?.parsedText ?? [];
+  const uploadId: string | null = location.state?.uploadId ?? null;
+  const incomingFields: DetectedField[] =
+    location.state?.detectedFields ?? [];
 
-  if (!parsedText.length || !uploadId) {
-    return <div className="p-8">No preview data found.</div>;
+  /* =======================
+     Guard
+  ======================= */
+
+  if (!parsedText.length || !uploadId || !incomingFields.length) {
+    return (
+      <div className="p-8 text-sm text-muted-foreground">
+        No preview data found.
+      </div>
+    );
   }
 
   /* =======================
-     FIELD DETECTION
-     (Semantic, deduplicated)
+     Local editable state
   ======================= */
 
-  useEffect(() => {
-    const fieldMap = new Map<string, DetectedField>();
+  const [fields, setFields] = useState<DetectedField[]>(
+    incomingFields.map((f) => ({
+      ...f,
+      value: f.value ?? "",
+    }))
+  );
 
-    parsedText.forEach((paragraph, index) => {
-      const normalized = paragraph.toLowerCase();
-
-      FIELD_REGISTRY.forEach((reg) => {
-        const matched = reg.patterns.some((p) => p.test(normalized));
-        if (!matched) return;
-
-        if (!fieldMap.has(reg.field_key)) {
-          fieldMap.set(reg.field_key, {
-            field_key: reg.field_key,
-            label: reg.label,
-            field_type: reg.field_type,
-            is_required: reg.is_required,
-            occurrences: [],
-          });
-        }
-
-        fieldMap.get(reg.field_key)!.occurrences.push({
-          paragraph_index: index,
-        });
-      });
-    });
-
-    setDetectedFields(Array.from(fieldMap.values()));
-  }, [parsedText]);
+  const [isSaving, setIsSaving] = useState(false);
 
   /* =======================
-     PREVIEW RENDERING
+     Preview Renderer
   ======================= */
 
-  const renderParagraph = (text: string, index: number) => {
-    let content = text;
+  const renderParagraphWithFields = (
+    text: string,
+    paragraphIndex: number
+  ) => {
+    const paragraphFields = fields
+      .filter((f) => f.paragraph_index === paragraphIndex)
+      .sort((a, b) => a.start - b.start);
 
-    detectedFields.forEach((field) => {
-      const occursHere = field.occurrences.some(
-        (o) => o.paragraph_index === index
+    if (paragraphFields.length === 0) return text;
+
+    const nodes: React.ReactNode[] = [];
+    let cursor = 0;
+
+    paragraphFields.forEach((field) => {
+      // text before field
+      if (cursor < field.start) {
+        nodes.push(
+          <span key={`${field.id}-text`}>
+            {text.slice(cursor, field.start)}
+          </span>
+        );
+      }
+
+      // inline input
+      nodes.push(
+        <input
+          key={field.id}
+          value={field.value}
+          placeholder={field.label}
+          onChange={(e) =>
+            setFields((prev) =>
+              prev.map((f) =>
+                f.id === field.id
+                  ? { ...f, value: e.target.value }
+                  : f
+              )
+            )
+          }
+          className="inline-block min-w-[160px] px-2 py-0.5 mx-1
+                     border border-blue-500 rounded bg-blue-50
+                     focus:outline-none focus:ring-2 focus:ring-blue-300"
+        />
       );
-      if (!occursHere) return;
 
-      const registry = getRegistryItem(field.field_key);
-      if (!registry) return;
-
-      registry.patterns.forEach((pattern) => {
-        content = content.replace(pattern, `{{${field.field_key}}}`);
-      });
+      cursor = field.end;
     });
 
-    const parts = content.split(/(\{\{.*?\}\})/g);
-
-    return parts.map((part, i) => {
-      const field = detectedFields.find(
-        (f) => `{{${f.field_key}}}` === part
+    // remaining text
+    if (cursor < text.length) {
+      nodes.push(
+        <span key="end">{text.slice(cursor)}</span>
       );
+    }
 
-      if (!field) return part;
-
-      return (
-        <span
-          key={i}
-          className={`px-1 rounded font-medium ${
-            formData[field.field_key]
-              ? "bg-green-100 text-green-800"
-              : "bg-yellow-100 text-yellow-800"
-          }`}
-        >
-          {formData[field.field_key] || field.label}
-        </span>
-      );
-    });
+    return nodes;
   };
 
   /* =======================
-     BACKEND PAYLOAD
+     Create Template → Redirect
   ======================= */
-
-  const buildBackendFields = () =>
-    detectedFields.map((f) => ({
-      field_key: f.field_key,
-      label: f.label,
-      field_type: f.field_type,
-      is_required: f.is_required,
-      occurrences: f.occurrences,
-    }));
 
   const handleCreateTemplate = async () => {
     try {
+      setIsSaving(true);
+
       const result = await createTemplate({
         upload_id: uploadId,
-        name: "Legal LLP Template",
-        description: "Semantic template generated from document",
-        fields: buildBackendFields(),
+        name: "Auto Generated Template",
+        description: "Generated from uploaded document",
+        fields: fields.map((f) => ({
+          field_key: f.field_key,
+          label: f.label,
+          field_type: f.field_type,
+          is_required: f.is_required,
+          source_temp_id: f.id,
+          location_json: {
+            version: 1,
+            kind: "range_in_text",
+            paragraph_index: f.paragraph_index,
+            start: f.start,
+            end: f.end,
+          },
+        })),
       });
 
+      // ✅ DIRECT NEXT STEP — NO TEMPLATE PAGE
       navigate(`/generate/${result.template_id}`, {
-        state: { fields: detectedFields },
+        state: {
+          fields: fields.map((f) => ({
+            field_key: f.field_key,
+            label: f.label,
+            field_type: f.field_type,
+            is_required: f.is_required,
+          })),
+        },
       });
     } catch (err) {
-      console.error(err);
-      alert("Template creation failed");
+      console.error("Template creation failed", err);
+      alert("Failed to create template");
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -712,57 +1222,118 @@ export default function DocumentPreview() {
   ======================= */
 
   return (
-    <>
-      <h2 className="text-xl font-bold mb-4">Document Preview</h2>
-
-      {/* Preview */}
-      <div className="border rounded bg-white p-6 max-h-[60vh] overflow-y-auto space-y-3">
-        {parsedText.map((text, index) => (
-          <p key={index} className="text-sm leading-relaxed">
-            {renderParagraph(text, index)}
-          </p>
-        ))}
+    <div className="space-y-10">
+      {/* Header */}
+      <div>
+        <h2 className="text-xl font-bold mb-1">
+          Document Preview
+        </h2>
+        <p className="text-sm text-muted-foreground">
+          Review detected fields and continue
+        </p>
       </div>
 
-      {/* Fill Data */}
-      {detectedFields.length > 0 && (
-        <div className="mt-8 border rounded bg-white p-6">
-          <h3 className="text-lg font-semibold mb-4">Client Details</h3>
+      {/* Preview */}
+      <div className="rounded-lg border bg-white p-6 shadow-sm">
+        <div className="space-y-3 max-h-[60vh] overflow-y-auto">
+          {parsedText.map((text, index) => (
+            <p
+              key={index}
+              className="text-sm text-gray-800 leading-relaxed"
+            >
+              {renderParagraphWithFields(text, index)}
+            </p>
+          ))}
+        </div>
+      </div>
 
-          <div className="space-y-4">
-            {detectedFields.map((field) => (
-              <div key={field.field_key}>
-                <label className="block text-sm font-medium mb-1">
-                  {field.label}
-                </label>
+      {/* Field Configuration */}
+      <div className="rounded-lg border bg-white p-6 shadow-sm">
+        <h3 className="text-lg font-semibold mb-4">
+          Template Fields
+        </h3>
+
+        <div className="space-y-4">
+          {fields.map((field) => (
+            <div
+              key={field.id}
+              className="grid grid-cols-4 gap-4 items-center border-b pb-3"
+            >
+              <input
+                value={field.label}
+                onChange={(e) =>
+                  setFields((prev) =>
+                    prev.map((f) =>
+                      f.id === field.id
+                        ? { ...f, label: e.target.value }
+                        : f
+                    )
+                  )
+                }
+                className="border px-2 py-1 rounded"
+              />
+
+              <select
+                value={field.field_type}
+                onChange={(e) =>
+                  setFields((prev) =>
+                    prev.map((f) =>
+                      f.id === field.id
+                        ? {
+                            ...f,
+                            field_type: e.target.value as any,
+                          }
+                        : f
+                    )
+                  )
+                }
+                className="border px-2 py-1 rounded"
+              >
+                <option value="text">Text</option>
+                <option value="date">Date</option>
+                <option value="number">Number</option>
+              </select>
+
+              <label className="flex items-center gap-2">
                 <input
-                  type={field.field_type}
-                  value={formData[field.field_key] || ""}
+                  type="checkbox"
+                  checked={field.is_required}
                   onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      [field.field_key]: e.target.value,
-                    }))
+                    setFields((prev) =>
+                      prev.map((f) =>
+                        f.id === field.id
+                          ? {
+                              ...f,
+                              is_required: e.target.checked,
+                            }
+                          : f
+                      )
+                    )
                   }
-                  className="w-full border rounded px-3 py-2 text-sm"
                 />
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+                Required
+              </label>
 
-      {/* Create Template */}
-      {detectedFields.length > 0 && (
-        <div className="mt-6 flex justify-end">
-          <button
-            onClick={handleCreateTemplate}
-            className="px-6 py-2 rounded-md bg-black text-white"
-          >
-            Create Template
-          </button>
+              <input
+                value={field.field_key}
+                readOnly
+                className="border px-2 py-1 rounded bg-gray-100"
+              />
+            </div>
+          ))}
         </div>
-      )}
-    </>
+      </div>
+
+      {/* Footer */}
+      <div className="flex justify-end">
+        <button
+          onClick={handleCreateTemplate}
+          disabled={isSaving}
+          className="px-6 py-2 bg-black text-white rounded disabled:opacity-60"
+        >
+          {isSaving ? "Creating..." : "Continue"}
+        </button>
+      </div>
+    </div>
   );
 }
